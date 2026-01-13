@@ -3,7 +3,7 @@ import requests
 import feedparser
 import datetime
 
-# Secrets (We will set these in Step 3)
+# Secrets
 BOT_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
@@ -12,27 +12,34 @@ RSS_URL = "https://news.google.com/rss/search?q=Nashik+milk+rate+procurement+man
 def send_telegram_message(message):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": message, "parse_mode": "Markdown"}
-    requests.post(url, json=payload)
+    
+    print(f"Attempting to send message to ID: {CHAT_ID}...")
+    response = requests.post(url, json=payload)
+    
+    # PRINT THE RESULT FROM TELEGRAM
+    print(f"Telegram Response Code: {response.status_code}")
+    print(f"Telegram Response Text: {response.text}")
 
 def check_rates():
+    # 1. FORCE A MESSAGE FOR TESTING
+    print("Starting test run...")
+    send_telegram_message("🔔 **Test Message:** The bot is connected to this group successfully.")
+
+    # 2. PROCEED WITH NORMAL CHECK
     feed = feedparser.parse(RSS_URL)
-    
     updates_found = False
-    today = datetime.date.today().strftime("%d %b %Y")
-    message = f"🥛 **Daily Milk Rate Check ({today})**\n\n"
+    message = "🥛 **News Found:**\n\n"
     
     if feed.entries:
         for entry in feed.entries[:3]:
-            # Filter for relevant keywords to reduce noise
             if any(word in entry.title.lower() for word in ['milk', 'rate', 'price', 'dudh', 'lakh']):
                 message += f"• [{entry.title}]({entry.link})\n\n"
                 updates_found = True
     
-    # Only send if we found news OR if it's a Monday (weekly heartbeat check)
     if updates_found:
         send_telegram_message(message)
-    elif datetime.datetime.today().weekday() == 0: # Optional: confirm bot is alive on Mondays
-        send_telegram_message("No specific milk rate news today. Bot is active.")
+    else:
+        print("No specific news keywords matched today.")
 
 if __name__ == "__main__":
     check_rates()
