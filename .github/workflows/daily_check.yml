@@ -1,0 +1,29 @@
+name: Daily Milk Rate Check
+
+on:
+  schedule:
+    # Runs at 03:30 UTC everyday (which is 9:00 AM India Standard Time)
+    - cron: '30 3 * * *'
+  workflow_dispatch: # This allows you to click a button to test it manually
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py
