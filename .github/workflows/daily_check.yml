@@ -3,7 +3,7 @@ name: Daily Milk Rate Check
 on:
   schedule:
     # Runs at 03:30 UTC everyday (which is 9:00 AM India Standard Time)
-    - cron: '30 3 * * *'
+    - cron: '30 7 * * *'
   workflow_dispatch: # This allows you to click a button to test it manually
 
 jobs:
