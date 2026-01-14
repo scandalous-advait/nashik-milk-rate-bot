@@ -36,10 +36,14 @@ def check_rates():
                 message += f"• [{entry.title}]({entry.link})\n\n"
                 updates_found = True
     
+    # --- SENDING LOGIC ---
     if updates_found:
         send_telegram_message(message)
+        print("News found! Message sent.")
     else:
-        print("No specific news keywords matched today.")
+        # For your demo/team: Always send a message even if no news
+        send_telegram_message(f"📉 **Daily Update ({today_str}):** No significant milk rate changes found in the news today.")
+        print("No news, but sent daily summary.")
 
 if __name__ == "__main__":
     check_rates()
